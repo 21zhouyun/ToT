@@ -12,8 +12,7 @@ def beam_search(input, task, beam_size, max_depth):
 
         print(f"Round {i} all candidates: {current}")
 
-        while len(current) > 0:
-            score, proposal, current_state = current.pop()
+        for (score, proposal, current_state) in current:
 
             print(f"Round {i} proposal: {proposal}, current_state: {current_state}, score: {score}")
 
@@ -27,9 +26,9 @@ def beam_search(input, task, beam_size, max_depth):
             proposals, next_states = task.generate_proposals(current_state)
             for p, l in zip(proposals, next_states):
                 score = task.evaluate(l)
-                next.append((score, proposal + '\n' + p, l))
+                next.append((score, proposal + ';' + p, l))
 
-                print(f"Round {i} candidate current: {current_state}, proposal: {p}, next_state: {l}, score: {score}")
+                print(f"Round {i} candidate current: {current_state}, proposal: {proposal};{p}, next_state: {l}, score: {score}")
 
         current = sorted(next, reverse=True)[:beam_size]
 
@@ -39,5 +38,5 @@ if __name__ == "__main__":
     from task_24 import Game24
     task = Game24()
 
-    solutions = beam_search("3 3 6 10", task, 3, 4)
+    solutions = beam_search("3 3 6 10", task, beam_size=5, max_depth=4)
     print(solutions)

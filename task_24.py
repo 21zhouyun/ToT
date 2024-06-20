@@ -3,9 +3,6 @@ import heapq
 import game24_prompts
 import re
 import model
-import logging
-
-logging.basicConfig(filename='task24.log', encoding='utf-8', level=logging.DEBUG)
 
 class Game24():
     def __init__(self):
@@ -57,7 +54,7 @@ class Game24():
 
         return score
 
-task = Game24()
+# task = Game24()
 # print(task.generate_proposals("3 3 6 10"))
-print(task.extract_proposal("3 + 3 = 6 (left: 6 6 10)"))
+# print(task.extract_proposal("3 + 3 = 6 (left: 6 6 10)"))
 # print(task.evaluate("6 6 10"))
