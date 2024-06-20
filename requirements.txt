@@ -2,3 +2,4 @@ openai
 numpy
 matplotlib
 pandas
+sympy
