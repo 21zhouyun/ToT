@@ -8,37 +8,43 @@ import logging
 logging.basicConfig(filename='task24.log', encoding='utf-8', level=logging.DEBUG)
 
 class Game24():
-    def __init__(self, data_path):
+    def __init__(self):
         self.client = model.GPT()
-        self.data = pd.read_csv(data_path)
 
     def extract_proposal(self, content):
-        pattern = r'\(left:\s*(.*?)\)'
+        proposal = ""
+        left = ""
 
-        # Using re.search to find the pattern in the text
-        match = re.search(pattern, content)
-
-        # Extracting the matched content
-        if match:
-            result = match.group(1)
-            return result
+        splitted = content.split("(")
+        if len(splitted) < 2:
+            return proposal, left
         
-        return None
+        proposal = splitted[0]
 
-    def generate_one(self, puzzle):
+        # Extract what's left
+        pattern = r'\(left:\s*(.*?)\)'
+        match = re.search(pattern, content)
+        if match:
+            left = match.group(1)
+        
+        return proposal, left
+
+    def generate_proposals(self, puzzle):
         prompt = game24_prompts.propose_prompt.format(input=puzzle)
         contents = self.client.call(prompt, n=1)
         content = contents[0]
 
         proposals = []
+        next_states = []
         for item in content.split("\n"):
-            proposal = self.extract_proposal(item)
-            if proposal:
+            proposal, left = self.extract_proposal(item)
+            if len(proposal) > 0 and len(left) > 0:
                 proposals.append(proposal)
+                next_states.append(left)
 
-        return proposals
+        return proposals, next_states
 
-    def evaluate_one(self, proposal):
+    def evaluate(self, proposal):
         prompt = game24_prompts.value_prompt.format(input=proposal)
 
         score = 0 
@@ -51,7 +57,7 @@ class Game24():
 
         return score
 
-task = Game24("data/24.csv")
-print(task.generate_one("6 4"))
-# print(task.evaluate_one("6 6 10"))
-# print(task.extract_proposal("3 + 3 = 6 (left: 6 6 10)"))
+task = Game24()
+# print(task.generate_proposals("3 3 6 10"))
+print(task.extract_proposal("3 + 3 = 6 (left: 6 6 10)"))
+# print(task.evaluate("6 6 10"))
